@@ -3,6 +3,7 @@
   "displayName": "show-x509",
   "description": "Shows the content of PEM-encoded x509 certificates (and similar)",
   "version": "0.0.1",
+  "repository": "https://github.com/wintersteiger/vscode-x509.git",
   "engines": {
     "vscode": "^1.75.0"
   },
