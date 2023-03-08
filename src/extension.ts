@@ -1,7 +1,18 @@
 import * as vscode from "vscode";
 
+var spawnSync = require("child_process").spawnSync;
+
+var binary: string = "openssl";
+var args: string[] = [];
+
 function runOpenSSL() {
-	console.log("runOpenSSL");
+	let config = vscode.workspace.getConfiguration("show-x509");
+	let cfgBinary: string | undefined = config.get("opensslBinary");
+	let cfgArgs: string[] | undefined = config.get("opensslArguments");
+
+	if (cfgBinary) { binary = cfgBinary; }
+	if (cfgArgs) { args = cfgArgs; }
+
 	let r: string[] = [];
 	let editor = vscode.window.activeTextEditor;
 	if (editor) {
@@ -11,19 +22,24 @@ function runOpenSSL() {
 					let txt = editor.document.getText(sel);
 
 					txt = txt.replace(/(?:\\r\\n|\\r|\\n)/g, '\n');
+					try {
+						var prc = spawnSync(binary, ["x509", "-text", ...args], {
+							input: txt,
+							encoding: "utf-8",
+						});
+					}
+					catch (ex) {
+						vscode.window.showErrorMessage("Exception: " + ex);
+					}
 
-					var spawnSync = require("child_process").spawnSync;
-					var prc = spawnSync("openssl", ["x509", "-text", "-nocert"], {
-						input: txt,
-						encoding: "utf-8",
-					});
-
-					if (prc.stderr !== "") {
-						vscode.window.showInformationMessage("Errors: " + prc.stderr);
+					if (prc.error) {
+						vscode.window.showErrorMessage("Error spawning process: " + prc.error.message);
+					}
+					else if (prc.stderr !== "") {
+						vscode.window.showInformationMessage("stderr: " + prc.stderr);
 						return r;
 					}
 					else {
-						console.log(prc.stdout);
 						r.push(prc.stdout);
 					}
 				}
@@ -33,9 +49,7 @@ function runOpenSSL() {
 	return r;
 }
 
-
 export function activate(context: vscode.ExtensionContext) {
-	console.log("pushing");
 	context.subscriptions.push(
 		vscode.commands.registerCommand("show-x509.show-pem-certificate", () => {
 			var outputs = runOpenSSL();
@@ -49,5 +63,4 @@ export function activate(context: vscode.ExtensionContext) {
 		}));
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() { }

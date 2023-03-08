@@ -2,8 +2,9 @@
   "name": "show-x509",
   "displayName": "show-x509",
   "description": "Shows the content of PEM-encoded x509 certificates (and similar)",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "repository": "https://github.com/wintersteiger/vscode-x509.git",
+  "publisher": "wintersteiger",
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -12,6 +13,22 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "title": "show-x509",
+    "configuration": {
+      "title": "show-x509",
+      "properties": {
+        "show-x509.opensslBinary": {
+          "type": "string",
+          "default": "openssl",
+          "description": "Path to the OpenSSL binary."
+        },
+        "show-x509.opensslArguments": {
+          "type": "string[]",
+          "default": [],
+          "description": "Optional arguments for the OpenSSL binary."
+        }
+      }
+    },
     "commands": [
       {
         "command": "show-x509.show-pem-certificate",
