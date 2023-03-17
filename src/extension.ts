@@ -21,7 +21,8 @@ function runOpenSSL() {
 				for (let sel of editor.selections) {
 					let txt = editor.document.getText(sel);
 
-					txt = txt.replace(/(?:\\r\\n|\\r|\\n)/g, '\n');
+					txt = txt.replace(/(?:\\+r)/g, '');
+					txt = txt.replace(/(?:\\+n)/g, '\n');
 					try {
 						var prc = spawnSync(binary, ["x509", "-text", ...args], {
 							input: txt,
